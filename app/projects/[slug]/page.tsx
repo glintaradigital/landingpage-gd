@@ -2,151 +2,166 @@
 
 import { useState, use } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
-const projectsData: Record<string, any> = {
-  'brand-identity': {
+interface Project {
+  id: number;
+  title: string;
+  category: string;
+  client: string;
+  year: string;
+  description: string;
+  challenge: string;
+  solution: string;
+  results: string[];
+  image: string;
+  images: string[];
+}
+
+const projectsData: Record<string, Project> = {
+  'saas-dashboard': {
     id: 1,
-    title: 'Brand Identity',
-    category: 'Branding',
-    client: 'Fashion Retail Company',
+    title: 'SaaS Analytics Dashboard',
+    category: 'Web App',
+    client: 'DataFlow Systems',
     year: '2024',
     description:
-      'Complete brand identity overhaul for a luxury fashion retailer. We developed a comprehensive visual language, including logo redesign, color palette, typography guidelines, and brand assets.',
+      'A comprehensive business intelligence platform that provides real-time data visualization and predictive analytics for enterprise clients.',
     challenge:
-      'The client needed to modernize their brand while maintaining recognition among their loyal customer base. The challenge was to create a fresh, contemporary identity without alienating existing customers.',
+      'The client needed to process millions of data points per second and present them in an intuitive, responsive dashboard without latency issues.',
     solution:
-      'We conducted extensive market research and competitor analysis. The new identity maintains key elements of their heritage while introducing modern design principles. The result is a versatile system that works across all touchpoints.',
+      'We implemented a robust data pipeline using WebSocket for real-time updates and optimized React components with heavy memoization. The backend was built on a distributed microservices architecture.',
     results: [
-      'Brand recognition increased by 35%',
-      '48% improvement in social media engagement',
-      'Successfully implemented across all business units',
-    ],
-    image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&h=600&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
-    ],
-  },
-  'digital-campaign': {
-    id: 2,
-    title: 'Digital Campaign',
-    category: 'Marketing',
-    client: 'Tech Startup',
-    year: '2024',
-    description:
-      'Multi-channel digital campaign for a tech startup launching their innovative product. Campaign included social media, email marketing, content creation, and paid advertising.',
-    challenge:
-      'Limited budget and tight timeline to launch before competitor products. Need to create buzz and drive early adopter interest.',
-    solution:
-      'Created a guerrilla marketing approach with viral-worthy content. Used influencer partnerships and organic social media amplification to maximize reach without huge ad spend.',
-    results: [
-      '500K impressions in first week',
-      '12% conversion rate on landing page',
-      '2M in generated revenue',
-    ],
-    image: 'https://images.unsplash.com/photo-1559163853-98c7f14dc1c0?w=1200&h=600&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1559163853-98c7f14dc1c0?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1559163853-98c7f14dc1c0?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1559163853-98c7f14dc1c0?w=600&h=400&fit=crop',
-    ],
-  },
-  'web-design': {
-    id: 3,
-    title: 'Web Design',
-    category: 'Design',
-    client: 'E-commerce Platform',
-    year: '2023',
-    description:
-      'Complete website redesign for an e-commerce platform focusing on user experience and conversion optimization. Implemented modern design principles and improved site performance.',
-    challenge:
-      'High bounce rate and low conversion rates. Existing design was outdated and not mobile-friendly.',
-    solution:
-      'Conducted user testing and analytics review. Redesigned with mobile-first approach, improved navigation, and streamlined checkout process.',
-    results: [
-      '45% increase in conversion rate',
-      '60% improvement in mobile traffic',
-      'Page load time reduced by 50%',
-    ],
-    image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&h=600&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
-    ],
-  },
-  'mobile-app': {
-    id: 4,
-    title: 'Mobile App',
-    category: 'Development',
-    client: 'Fintech Startup',
-    year: '2023',
-    description:
-      'Native iOS and Android app development for a fintech startup. The app provides seamless payment processing, account management, and financial insights to users.',
-    challenge:
-      'Building a secure, user-friendly app that meets regulatory requirements while delivering excellent performance on both platforms.',
-    solution:
-      'Implemented robust backend infrastructure with encryption, created intuitive UI/UX, and conducted extensive security audits. Used native development for optimal performance.',
-    results: [
-      '100K downloads in first month',
-      '4.8 star rating on app stores',
-      '95% user retention rate',
-    ],
-    image: 'https://images.unsplash.com/photo-1512941691920-25bda36dc643?w=1200&h=600&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1512941691920-25bda36dc643?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1512941691920-25bda36dc643?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1512941691920-25bda36dc643?w=600&h=400&fit=crop',
-    ],
-  },
-  'social-media': {
-    id: 5,
-    title: 'Social Media',
-    category: 'Content',
-    client: 'Lifestyle Brand',
-    year: '2023',
-    description:
-      'Comprehensive social media strategy and content creation for a lifestyle brand. Managed Instagram, TikTok, and YouTube channels with consistent, engaging content.',
-    challenge:
-      'Low engagement rates and inconsistent posting schedule. Need to build authentic community and increase follower growth.',
-    solution:
-      'Developed content calendar with mix of educational, entertaining, and promotional content. Engaged with community regularly and collaborated with micro-influencers.',
-    results: [
-      '300% follower growth in 6 months',
-      '25% average engagement rate',
-      'Secured brand partnerships worth 500K',
+      'Real-time data latency reduced by 80%',
+      'Handled 5x increase in concurrent users',
+      'Improved decision-making speed for clients by 40%',
     ],
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=600&fit=crop',
     images: [
       'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1504868584819-f8e90526354a?w=600&h=400&fit=crop',
     ],
   },
-  'video-production': {
-    id: 6,
-    title: 'Video Production',
-    category: 'Media',
-    client: 'Corporate Firm',
+  'fintech-wallet': {
+    id: 2,
+    title: 'Fintech Mobile Wallet',
+    category: 'Mobile App',
+    client: 'NextGen Payments',
+    year: '2024',
+    description:
+      'A secure, user-friendly mobile wallet application supporting multi-currency transactions, instant peer-to-peer transfers, and crypto integration.',
+    challenge:
+      'Ensuring top-tier security and regulatory compliance while maintaining a friction-less user experience for non-technical users.',
+    solution:
+      'We used biometric authentication, multi-signature transaction approval, and a highly secure hardware security module (HSM) integration. The UI was designed for simplicity and speed.',
+    results: [
+      'Zero security breaches since launch',
+      'App store rating of 4.9/5.0',
+      'Processed over $100M in transactions in the first quarter',
+    ],
+    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&h=600&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=600&h=400&fit=crop',
+    ],
+  },
+  'inventory-system': {
+    id: 3,
+    title: 'Inventory Management System',
+    category: 'Desktop App',
+    client: 'Global Logistics Corp',
     year: '2023',
     description:
-      'Professional video production for corporate marketing and training. Created product demo videos, testimonial videos, and internal training materials.',
+      'A cross-platform desktop application for large-scale warehouse management, featuring barcode scanning, automated reordering, and deep ERP integration.',
     challenge:
-      'Need to convey complex product features in an engaging, easy-to-understand format within a limited budget.',
+      'Legacy systems were slow and prone to errors. Warehouse staff needed a high-performance tool that could work offline and sync perfectly when back online.',
     solution:
-      'Used creative storytelling, motion graphics, and professional cinematography. Edited multiple versions for different platforms and audiences.',
+      'Built with Electron for cross-platform support with a local SQLite database for offline-first capabilities. Implemented a sophisticated conflict resolution algorithm for data syncing.',
     results: [
-      '500K views on YouTube',
-      '40% reduction in support tickets',
-      '2.5M earned media value',
+      'Inventory accuracy improved by 99.9%',
+      'Warehouse operational costs reduced by 25%',
+      'System uptime maintained at 99.99%',
     ],
-    image: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=1200&h=600&fit=crop',
+    image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=1200&h=600&fit=crop',
     images: [
-      'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1553413077-190dd305871c?w=600&h=400&fit=crop',
+    ],
+  },
+  'healthcare-portal': {
+    id: 4,
+    title: 'Healthcare Patient Portal',
+    category: 'Web App',
+    client: 'Unity Health Network',
+    year: '2023',
+    description:
+      'A secure HIPAA-compliant web portal for patients to access medical records, schedule appointments, and communicate with doctors via encrypted messaging.',
+    challenge:
+      'Managing sensitive health data with strict security protocols while ensuring the portal was accessible for elderly patients.',
+    solution:
+      'Implemented end-to-end encryption for all messages and data at rest. Conducted accessibility audits to ensure WCAG 2.1 Level AA compliance.',
+    results: [
+      '40% increase in patient engagement',
+      'Appointment no-shows decreased by 30%',
+      'Full HIPAA and GDPR compliance verified by external audit',
+    ],
+    image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200&h=600&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1532187875605-1803a63972bc?w=600&h=400&fit=crop',
+    ],
+  },
+  'logistics-app': {
+    id: 5,
+    title: 'Logistics Tracking App',
+    category: 'Mobile App',
+    client: 'SwiftDelivery',
+    year: '2023',
+    description:
+      'A real-time delivery tracking application for both drivers and customers, featuring route optimization and automated proof of delivery.',
+    challenge:
+      'High battery consumption during GPS tracking and inaccurate ETA predictions due to traffic fluctuations.',
+    solution:
+      'Optimized GPS polling algorithms to save battery and integrated real-time traffic data from multiple APIs for precise ETA calculations.',
+    results: [
+      '30% reduction in average delivery time',
+      'Driver battery life increased by 40%',
+      'Customer satisfaction score improved from 3.8 to 4.7',
+    ],
+    image: 'https://images.unsplash.com/photo-1512941691920-25bda36dc643?w=1200&h=600&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1512941691920-25bda36dc643?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1519055376510-746975a6c40e?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&h=400&fit=crop',
+    ],
+  },
+  'ai-assistant': {
+    id: 6,
+    title: 'AI Code Assistant',
+    category: 'Desktop App',
+    client: 'CodeLeap Technologies',
+    year: '2024',
+    description:
+      'An intelligent desktop application that assists developers with code generation, bug fixing, and documentation using localized LLM models.',
+    challenge:
+      'Providing powerful AI capabilities without requiring high-end GPU hardware or constant internet connection.',
+    solution:
+      'Implemented quantized local models optimized for CPU performance and built a fast, native-feeling UI with Rust and Tauri.',
+    results: [
+      'Developer productivity increased by 50%',
+      'Runs efficiently on standard laptop hardware',
+      'Ensures data privacy by keeping code local',
+    ],
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=600&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=600&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop',
     ],
   },
 };
@@ -186,7 +201,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
       <div className="border-b border-gray-800 px-6 lg:px-16 py-8 lg:py-12">
         <Link
           href="/#portfolio"
-          className="inline-flex items-center gap-2 text-sm font-medium mb-6 text-gray-400 hover:text-black dark:hover:text-white"
+          className="inline-flex items-center gap-2 text-sm font-medium mb-6 text-gray-400 hover:text-white"
         >
           <ArrowLeft size={16} />
           Back to Portfolio
@@ -277,7 +292,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ slug: 
           <section>
             <h2 className="text-2xl font-light tracking-tight mb-6">Results</h2>
             <ul className="space-y-4">
-              {project.results.map((result, index) => (
+              {project.results.map((result: string, index: number) => (
                 <li
                   key={index}
                   className="flex items-start gap-4 text-base lg:text-lg text-gray-300"
